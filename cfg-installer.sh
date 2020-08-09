@@ -3,8 +3,7 @@
 sudo pacman -Syu
 sudo pacman -S $(cat packages)
 
-cp -r .bash_profile .bashrc .config/ .xinitrc .Xresources .xserverrc .xsession
-.xmonad/ .xmobar/  ~/
+cp -r .bash_profile .bashrc .config/ .xinitrc .Xresources .xserverrc .xsession .xmonad/ .xmobar/ ~/
 sudo cp -r xorg.conf.d /etc/X11/
 sudo cp custom.cfg /boot/grub/custom.cfg
 

@@ -134,6 +134,7 @@ arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
 arch-chroot /mnt git clone https://github.com/theopechli/cfg home/"${user}"/cfg
 arch-chroot /mnt systemctl enable NetworkManager.service
+arch-chroot /mnt ln -s usr/bin/nvim usr/bin/vi
 
 umount -R /mnt/
 reboot
