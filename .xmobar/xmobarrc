@@ -9,7 +9,7 @@ Config {
    -- layout
    , sepChar =  "%"   -- delineator between plugin names and straight text
    , alignSep = "}{"  -- separator between left-right alignment
-   , template = "%StdinReader% } %date% || %kbd% { %multicpu% | %coretemp% | %memory%|%swap% | %dynnetwork%"
+   , template = "%StdinReader% } %date%  %kbd% { %multicpu% %coretemp% %memory%|%swap% %dynnetwork%"
 
    -- general behavior
    , lowerOnStart =     True    -- send to bottom of window stack on start
@@ -36,25 +36,25 @@ Config {
    , commands = 
 
         -- network activity monitor (dynamic interface resolution)
-        [ Run DynNetwork     [ "--template" , "<dev>: <rx>kB/s|<tx>kB/s"
+        [ Run DynNetwork     [ "--template" , "<rx>kB/s|<tx>kB/s"
                              , "--Low"      , "1000"       -- units: B/s
                              , "--High"     , "5000"       -- units: B/s
                              , "--low"      , "green"
                              , "--normal"   , "orange"
                              , "--high"     , "red"
-                             ] 10
+                             ] 50
 
         -- cpu activity monitor
-        , Run MultiCpu       [ "--template" , "Cpu: <total0>%|<total1>%|<total2>%"
+        , Run MultiCpu       [ "--template" , "<total0>%|<total1>%|<total2>%"
                              , "--Low"      , "50"         -- units: %
                              , "--High"     , "85"         -- units: %
                              , "--low"      , "green"
                              , "--normal"   , "orange"
                              , "--high"     , "red"
-                             ] 10
+                             ] 50
 
         -- cpu core temperature monitor
-        , Run CoreTemp       [ "--template" , "Temp: <core0>°C|<core1>°C|<core2>°C"
+        , Run CoreTemp       [ "--template" , "<core0>°C|<core1>°C|<core2>°C"
                              , "--Low"      , "70"        -- units: °C
                              , "--High"     , "80"        -- units: °C
                              , "--low"      , "green"
@@ -63,13 +63,13 @@ Config {
                              ] 50
                           
          -- memory usage monitor
-        , Run Memory         [ "--template" ,"Mem: <usedratio>%"
+        , Run Memory         [ "--template" ,"<usedratio>%"
                              , "--Low"      , "20"        -- units: %
                              , "--High"     , "90"        -- units: %
                              , "--low"      , "green"
                              , "--normal"   , "orange"
                              , "--high"     , "red"
-                             ] 10
+                             ] 50
 
        -- memory usage monitor
         , Run Swap           [ "--template" ,"<usedratio>%"
@@ -78,11 +78,11 @@ Config {
                              , "--low"      , "green"
                              , "--normal"   , "orange"
                              , "--high"     , "red"
-                             ] 10
+                             ] 50
 
         -- time and date indicator 
         --   (%F = y-m-d date, %a = day of week, %T = h:m:s time)
-        , Run Date           "<fc=#f7f7f7>%F %A %T</fc>" "date" 10
+        , Run Date           "<fc=#f7f7f7>%F %A %T</fc>" "date" 50
 
         -- keyboard layout indicator
         , Run Kbd            [ ("us"         , "<fc=#FF0000>US</fc>")
