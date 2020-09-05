@@ -150,7 +150,7 @@ echo "$user:$password" | chpasswd --root /mnt
 echo "root:$password" | chpasswd --root /mnt
 
 # Configure mkinitcpio
-arch-chroot /mnt sed -i '/^HOOKS=(.*)/ s/)/ keyboard encrypt lvm2)/' /etc/mkinitcpio.conf
+arch-chroot /mnt sed -i '/^HOOKS=(.*)/ s/HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)/HOOKS=(base udev autodetect keyboard modconf block encrypt lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
 
 # Initramfs
 arch-chroot /mnt mkinitcpio -P
@@ -159,12 +159,12 @@ arch-chroot /mnt mkinitcpio -P
 arch-chroot /mnt bootctl install
 
 # Configure systemd-boot
-devUUID="$(lsblk -dno UUID "${part_sys}")"
-echo -e 'title   Arch Linux
+devUUID="$(lsblk -dno UUID ${part_sys})"
+echo -e "title   Arch Linux
 linux   /vmlinuz-linux
 initrd  /intel-ucode.img
 initrd  /initramfs-linux.img
-options cryptdevice=UUID="${devUUID}":cryptlvm root=/dev/MyVolGroup/root' > /mnt/boot/loader/entries/arch.conf
+options cryptdevice=UUID=${devUUID}:cryptlvm root=/dev/MyVolGroup/root" > /mnt/boot/loader/entries/arch.conf
 
 
 ## Reboot
