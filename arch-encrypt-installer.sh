@@ -81,7 +81,6 @@ sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk "${device}"
   1 # EFI System
   p # print the in-memory partition table
   w # write the partition table
-  q # and we're done
 EOF
 
 part_efi="$(ls ${device}* | grep -E "^${device}p?1$")"
@@ -130,10 +129,11 @@ arch-chroot /mnt ln -sf /usr/share/zoneinfo/"${region}"/"${city}" /etc/localtime
 arch-chroot /mnt hwclock --systohc
 
 # Localization
-arch-chroot /mnt sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /etc/locale.gen
-arch-chroot /mnt sed -i 's/#el_GR.UTF-8 UTF-8/el_GR.UTF-8 UTF-8/g' /etc/locale.gen
+arch-chroot /mnt sed -i 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+arch-chroot /mnt sed -i 's/# el_GR.UTF-8 UTF-8/el_GR.UTF-8 UTF-8/' /etc/locale.gen
 arch-chroot /mnt locale-gen
-echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf
+echo -e "LANG=en_US.UTF-8
+" > /mnt/etc/locale.conf
 
 # Network configuration
 echo "${hostname}" > /mnt/etc/hostname
@@ -164,7 +164,8 @@ echo -e "title   Arch Linux
 linux   /vmlinuz-linux
 initrd  /intel-ucode.img
 initrd  /initramfs-linux.img
-options cryptdevice=UUID=${devUUID}:cryptlvm root=/dev/MyVolGroup/root" > /mnt/boot/loader/entries/arch.conf
+options cryptdevice=UUID=${devUUID}:cryptlvm root=/dev/MyVolGroup/root
+" > /mnt/boot/loader/entries/arch.conf
 
 
 ## Reboot
