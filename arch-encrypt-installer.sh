@@ -69,13 +69,10 @@ timedatectl set-ntp true
 sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk "${device}"
   g # create a new empty GPT partition table
   n # add a new partition
-  p # primary partition
   1 # partition number 1
     # default - start at beginning of disk
   +512M # 512 MB EFI System parttion
-  n # add new partition
   n # add a new partition
-  p # primary partition
   2 # partion number 2
     # default, start immediately after preceding partition
     # default, extend partition to end of disk
