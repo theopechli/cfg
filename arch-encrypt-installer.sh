@@ -116,7 +116,7 @@ mount "${part_efi}" /mnt/boot
 
 ## Install essential packages
 
-pacstrap /mnt base base-devel linux linux-firmware lvm2 cryptsetup intel-ucode dhcpcd networkmanager git neovim
+pacstrap /mnt base base-devel linux linux-firmware lvm2 cryptsetup intel-ucode dhcpcd networkmanager git vim
 
 
 ## Configure the system
@@ -132,11 +132,13 @@ arch-chroot /mnt hwclock --systohc
 arch-chroot /mnt sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 arch-chroot /mnt sed -i 's/#el_GR.UTF-8 UTF-8/el_GR.UTF-8 UTF-8/' /etc/locale.gen
 arch-chroot /mnt locale-gen
+
 echo -e "LANG=en_US.UTF-8
 " > /mnt/etc/locale.conf
 
 # Network configuration
 echo "${hostname}" > /mnt/etc/hostname
+
 echo -e "127.0.0.1       localhost
 ::1             localhost
 127.0.1.1       ${hostname}.localdomain	${hostname}
@@ -160,6 +162,13 @@ arch-chroot /mnt bootctl install
 
 # Configure systemd-boot
 devUUID="$(lsblk -dno UUID ${part_sys})"
+
+echo -e "default  arch.conf
+timeout  2
+console-mode max
+editor   no
+" > /mnt/boot/loader/loader.conf
+
 echo -e "title   Arch Linux
 linux   /vmlinuz-linux
 initrd  /intel-ucode.img
@@ -172,6 +181,5 @@ options cryptdevice=UUID=${devUUID}:cryptlvm root=/dev/MyVolGroup/root
 
 arch-chroot /mnt git clone https://github.com/theopechli/cfg home/"${user}"/cfg
 arch-chroot /mnt systemctl enable NetworkManager.service
-arch-chroot /mnt ln -sf usr/bin/nvim usr/bin/vi
 umount -R /mnt/
 reboot
