@@ -1,15 +1,12 @@
 #!/bin/bash
 
-set -uo pipefail
-trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
-
 
 ## Select the mirrors
 
 MIRRORLIST_URL_1="https://www.archlinux.org/mirrorlist/?country=GR&protocol=https&use_mirror_status=on"
 MIRRORLIST_URL_2="https://www.archlinux.org/mirrorlist/?country=DE&country=SE&protocol=https&use_mirror_status=on"
 
-pacman -Sy --noconfirm pacman-contrib lvm2 cryptsetup
+pacman -Sy --noconfirm --needed pacman-contrib dialog
 
 echo "Updating mirror list"
 curl -s "$MIRRORLIST_URL_1" | \
@@ -48,12 +45,6 @@ clear
 devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
 device=$(dialog --stdout --menu "Select installation disk" 0 0 0 ${devicelist}) || exit 1
 clear
-
-
-## Set up logging
-
-exec 1> >(tee "stdout.log")
-exec 2> >(tee "stderr.log")
 
 
 ## Wipe the disk with dm-crypt
