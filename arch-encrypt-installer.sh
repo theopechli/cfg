@@ -129,8 +129,8 @@ arch-chroot /mnt ln -sf /usr/share/zoneinfo/"${region}"/"${city}" /etc/localtime
 arch-chroot /mnt hwclock --systohc
 
 # Localization
-arch-chroot /mnt sed -i 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
-arch-chroot /mnt sed -i 's/# el_GR.UTF-8 UTF-8/el_GR.UTF-8 UTF-8/' /etc/locale.gen
+arch-chroot /mnt sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+arch-chroot /mnt sed -i 's/#el_GR.UTF-8 UTF-8/el_GR.UTF-8 UTF-8/' /etc/locale.gen
 arch-chroot /mnt locale-gen
 echo -e "LANG=en_US.UTF-8
 " > /mnt/etc/locale.conf
