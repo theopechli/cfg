@@ -133,16 +133,14 @@ arch-chroot /mnt sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.ge
 arch-chroot /mnt sed -i 's/#el_GR.UTF-8 UTF-8/el_GR.UTF-8 UTF-8/' /etc/locale.gen
 arch-chroot /mnt locale-gen
 
-echo -e "LANG=en_US.UTF-8
-" > /mnt/etc/locale.conf
+echo -e "LANG=en_US.UTF-8" > /mnt/etc/locale.conf
 
 # Network configuration
 echo "${hostname}" > /mnt/etc/hostname
 
 echo -e "127.0.0.1       localhost
 ::1             localhost
-127.0.1.1       ${hostname}.localdomain	${hostname}
-" > /mnt/etc/hosts
+127.0.1.1       ${hostname}.localdomain	${hostname}" > /mnt/etc/hosts
 
 # Add user
 arch-chroot /mnt useradd -m -G wheel "$user"
@@ -164,17 +162,14 @@ arch-chroot /mnt bootctl install
 devUUID="$(lsblk -dno UUID ${part_sys})"
 
 echo -e "default  arch.conf
-timeout  2
-console-mode max
-editor   no
-" > /mnt/boot/loader/loader.conf
+timeout  3
+editor   no" > /mnt/boot/loader/loader.conf
 
 echo -e "title   Arch Linux
 linux   /vmlinuz-linux
 initrd  /intel-ucode.img
 initrd  /initramfs-linux.img
-options cryptdevice=UUID=${devUUID}:cryptlvm root=/dev/MyVolGroup/root
-" > /mnt/boot/loader/entries/arch.conf
+options cryptdevice=UUID=${devUUID}:cryptlvm root=/dev/MyVolGroup/root rw" > /mnt/boot/loader/entries/arch.conf
 
 
 ## Reboot
