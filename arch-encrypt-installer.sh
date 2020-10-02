@@ -176,5 +176,6 @@ options cryptdevice=UUID=${devUUID}:cryptlvm root=/dev/MyVolGroup/root rw" > /mn
 
 arch-chroot /mnt git clone https://github.com/theopechli/cfg home/"${user}"/cfg
 arch-chroot /mnt systemctl enable NetworkManager.service
+arch-chroot /mnt systemctl enable libvirtd.service
 umount -R /mnt/
 reboot
