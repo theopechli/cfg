@@ -1,24 +1,23 @@
-XTerm.termName: xterm-256color
-XTerm.vt100.backarrowKey: false
-XTerm.ttyModes: erase ^?
-XTerm*scrollBar: false
-XTerm.vt100.faceName: DejaVu Sans Mono:size=10:antialias=true
-XTerm*cursorColor: #DCDCCC
-XTerm*background: #3a3a3a
-XTerm*foreground: #dcdccc
-XTerm*color0: #000000
-XTerm*color8: #222222
-XTerm*color1: #e89393
-XTerm*color9: #dca3a3
-XTerm*color2: #688060
-XTerm*color10: #7f9f7f
-XTerm*color3: #f0dfaf
-XTerm*color11: #efef8f
-XTerm*color4: #93b3a31
-XTerm*color12: #6abeb1
-XTerm*color5: #bca3a3
-XTerm*color13: #c0bed1
-XTerm*color6: #93b3a3
-XTerm*color14: #8cd0d3
-XTerm*color7: #cccccc
-XTerm*color15: #ffffff
+URxvt*scrollTtyOutput: false
+URxvt*scrollWithBuffer: true
+URxvt*scrollTtyKeypress: true
+URxvt.secondaryScreen: 1
+URxvt.secondaryScroll: 0
+URxvt.letterSpace: -1
+URxvt.clipboard.autocopy: true
+URxvt.keysym.M-c: perl:clipboard:copy
+URxvt.keysym.M-v: perl:clipboard:paste
+Rxvt.perl-ext:
+URxvt.perl-ext-common:
+
+URxvt*font: xft:DejaVu Sans Mono:pixelsize=13
+URxvt.cursorBlink: true
+URxvt.saveline: 2048
+URxvt.depth: 24
+!URxvt.urgentOnBell: true
+
+*scrollBar: false
+
+*.foreground:   #cbcccf
+*.background:   #0e0e0f
+*.cursorColor:  #cbcccf
