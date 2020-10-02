@@ -17,3 +17,7 @@ alias rmpv='mpv av://v4l2:/dev/video0 --profile=low-latency --untimed'
 sc() {
     ffmpeg -f x11grab -video_size 1366x768 -i $DISPLAY -vframes 1 ~/Personal/Wallpapers/"$1".png
 }
+
+if [ -d "$HOME/bin" ] ; then
+    PATH="$PATH:$HOME/bin"
+fi
