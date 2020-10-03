@@ -14,10 +14,35 @@ URxvt*font: xft:DejaVu Sans Mono:pixelsize=13
 URxvt.cursorBlink: true
 URxvt.saveline: 2048
 URxvt.depth: 24
+URxvt.iso14755: false
 !URxvt.urgentOnBell: true
 
 *scrollBar: false
 
-*.foreground:   #cbcccf
-*.background:   #0e0e0f
-*.cursorColor:  #cbcccf
+*background: #0f0f0f
+*foreground: #c8c8c8
+
+!black
+*color0:  #251f1f
+*color8:  #5e5e5e
+!red
+*color1:  #eb4509
+*color9:  #eb4509
+!green
+*color2:  #cde2cb
+*color10: #cde2cb
+!yellow
+*color3:  #ffac18
+*color11: #ffac18
+!blue
+*color4:  #46aede
+*color12: #46aede
+!magenta
+*color5:  #e32c57
+*color13: #e32c57
+!cyan
+*color6:  #d6dbac
+*color14: #d6dbac
+!white
+*color7:  #efefef
+*color15: #efefef
