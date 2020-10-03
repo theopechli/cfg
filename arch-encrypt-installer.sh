@@ -143,7 +143,7 @@ echo -e "127.0.0.1       localhost
 127.0.1.1       ${hostname}.localdomain	${hostname}" > /mnt/etc/hosts
 
 # Add user
-arch-chroot /mnt useradd -m -G wheel "$user"
+arch-chroot /mnt useradd -m -G wheel,video,libvirt "$user"
 
 # Root and User password
 echo "$user:$password" | chpasswd --root /mnt
