@@ -6,6 +6,11 @@ import XMonad.Util.EZConfig(additionalKeys)
 import System.IO
 import Graphics.X11.ExtraTypes.XF86
 import XMonad.Layout.Gaps
+import XMonad.Layout.NoBorders (noBorders, smartBorders)
+import XMonad.Layout.Fullscreen (fullscreenFull, fullscreenSupport)
+import XMonad.Layout.Grid (Grid(..))
+import XMonad.Layout.TwoPane (TwoPane(..))
+import XMonad.Layout.Tabbed (simpleTabbed)
 
 main = do
     xmproc <- spawnPipe "xmobar"
@@ -15,7 +20,10 @@ main = do
     xmonad $ docks def
         { modMask = mod4Mask
         , terminal = "urxvt"
-        , layoutHook = avoidStruts $ layoutHook def
+--        , layoutHook = avoidStruts $ layoutHook def
+        , layoutHook = avoidStruts $ smartBorders $
+          noBorders Full
+          ||| Grid
         , logHook = dynamicLogWithPP $ def
         { ppOutput = hPutStrLn xmproc
         , ppCurrent = xmobarColor "yellow" ""
@@ -53,6 +61,6 @@ main = do
         , ((mod4Mask, xK_n), spawn "redshift")
         , ((mod4Mask .|. shiftMask, xK_n), spawn "killall redshift")
         , ((mod4Mask, xK_b), sendMessage ToggleStruts)
---        , ((mod4Mask .|. shiftMask, xK_m), spawn "xrandr --output VGA1 --mode 1920x1080 --pos 0x0 --rotate normal --output eDP1 --mode 1366x768 --pos 1920x580 --rotate normal")
+--        , ((mod4Mask .|. shiftMask, xK_m), spawn "xrandr --output VGA1 --mode 1920x1080 --pos 0x0 --rotate normal --right-of eDP1 --output eDP1 --mode 1366x768 --pos 1920x580 --rotate normal")
         , ((mod4Mask .|. shiftMask, xK_m), spawn "xrandr --output VGA1 --mode 1360x768 --pos 0x0 --rotate normal --right-of eDP1 --output eDP1 --mode 1366x768 --pos 1366x420 --rotate normal")
         ]
