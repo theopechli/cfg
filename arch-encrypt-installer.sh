@@ -3,19 +3,28 @@
 
 ## Select the mirrors
 
-MIRRORLIST_URL_1="https://www.archlinux.org/mirrorlist/?country=GR&protocol=https&use_mirror_status=on"
-MIRRORLIST_URL_2="https://www.archlinux.org/mirrorlist/?country=DE&country=SE&protocol=https&use_mirror_status=on"
+dialog --yesno "Do you want to rank the mirrors?" 0 0
+response=$?
+if [ $response -eq 0 ]
+then
+    MIRRORLIST_URL_1="https://archlinux.org/mirrorlist/?country=GR&protocol=https&use_mirror_status=on"
+    MIRRORLIST_URL_2="https://archlinux.org/mirrorlist/?country=DE&country=SE&protocol=https&use_mirror_status=on"
 
-pacman -Sy --noconfirm --needed pacman-contrib dialog
+    pacman -Sy --noconfirm --needed pacman-contrib dialog
 
-echo "Updating mirror list"
-curl -s "$MIRRORLIST_URL_1" | \
-    sed -e 's/^#Server/Server/' -e '/^#/d' | \
-    rankmirrors -n 5 - > /etc/pacman.d/mirrorlist
-curl -s "$MIRRORLIST_URL_2" | \
-    sed -e 's/^#Server/Server/' -e '/^#/d' | \
-    rankmirrors -n 5 - >> /etc/pacman.d/mirrorlist
+    echo "Backing up the mirror list"
+    cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
 
+    echo "Updating the mirror list"
+    curl -s "$MIRRORLIST_URL_1" | \
+        sed -e 's/^#Server/Server/' -e '/^#/d' | \
+        rankmirrors -n 5 - > /etc/pacman.d/mirrorlist
+    curl -s "$MIRRORLIST_URL_2" | \
+        sed -e 's/^#Server/Server/' -e '/^#/d' | \
+        rankmirrors -n 5 - >> /etc/pacman.d/mirrorlist
+
+    [ -s /etc/pacman.d/mirrorlist ] || cp /etc/pacman.d/mirrorlist.backup /etc/pacman.d/mirrorlist
+fi
 
 ## Get basic information
 
@@ -116,7 +125,7 @@ mount "${part_efi}" /mnt/boot
 
 ## Install essential packages
 
-pacstrap /mnt base base-devel linux linux-firmware lvm2 cryptsetup intel-ucode dhcpcd networkmanager git vim
+pacstrap /mnt base base-devel linux linux-firmware lvm2 cryptsetup intel-ucode dhcpcd networkmanager git neovim
 
 
 ## Configure the system
@@ -143,7 +152,7 @@ echo -e "127.0.0.1       localhost
 127.0.1.1       ${hostname}.localdomain	${hostname}" > /mnt/etc/hosts
 
 # Add user
-arch-chroot /mnt useradd -m -G wheel,video,libvirt "$user"
+arch-chroot /mnt useradd -m -G wheel,video "$user"
 
 # Root and User password
 echo "$user:$password" | chpasswd --root /mnt
@@ -175,7 +184,7 @@ options cryptdevice=UUID=${devUUID}:cryptlvm root=/dev/MyVolGroup/root rw" > /mn
 ## Reboot
 
 arch-chroot /mnt git clone https://github.com/theopechli/cfg home/"${user}"/cfg
+arch-chroot /mnt chown "${user}" home/"${user}"/cfg
 arch-chroot /mnt systemctl enable NetworkManager.service
-arch-chroot /mnt systemctl enable libvirtd.service
 umount -R /mnt/
 reboot
