@@ -11,4 +11,4 @@ fi
 export VISUAL=nvim
 export EDITOR="$VISUAL"
 export LANG=en_US.UTF-8
-export TERM=rxvt-unicode
+export TERM=st-256color
