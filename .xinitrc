@@ -35,4 +35,8 @@ fi
 [ -f /etc/xprofile ] && . /etc/xprofile
 [ -f ~/.xprofile ] && . ~/.xprofile
 
-exec xmonad
+while xsetroot -name "`date`"
+do
+    sleep 60
+done &
+exec dwm
