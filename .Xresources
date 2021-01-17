@@ -7,20 +7,18 @@ URxvt.letterSpace: -1
 URxvt.clipboard.autocopy: true
 URxvt.keysym.M-c: perl:clipboard:copy
 URxvt.keysym.M-v: perl:clipboard:paste
-Rxvt.perl-ext:
+URxvt.perl-ext:
 URxvt.perl-ext-common:
-
-URxvt*font: xft:DejaVu Sans Mono:pixelsize=13
+URxvt*font: xft:Noto Sans Mono:pixelsize=13
 URxvt.cursorBlink: true
 URxvt.saveline: 2048
 URxvt.depth: 24
 URxvt.iso14755: false
 !URxvt.urgentOnBell: true
-
 *scrollBar: false
 
 *background: #0f0f0f
-*foreground: #c8c8c8
+*foreground: #f8f8f8
 
 !black
 *color0:  #251f1f
