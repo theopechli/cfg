@@ -18,6 +18,7 @@ alias gs='git status'
 alias gc='git commit -m'
 alias ga='git add'
 alias gd='git diff'
+alias gp='git push'
 
 sc() {
     ffmpeg -f x11grab -video_size 1366x768 -i $DISPLAY -vframes 1 "$1".png
