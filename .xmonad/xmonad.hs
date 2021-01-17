@@ -63,4 +63,5 @@ main = do
         , ((mod4Mask, xK_b), sendMessage ToggleStruts)
 --        , ((mod4Mask .|. shiftMask, xK_m), spawn "xrandr --output VGA1 --mode 1920x1080 --pos 0x0 --rotate normal --right-of eDP1 --output eDP1 --mode 1366x768 --pos 1920x580 --rotate normal")
         , ((mod4Mask .|. shiftMask, xK_m), spawn "xrandr --output VGA1 --mode 1360x768 --pos 0x0 --rotate normal --right-of eDP1 --output eDP1 --mode 1366x768 --pos 1366x420 --rotate normal")
+        , ((mod4Mask .|. shiftMask .|. controlMask, xK_m), spawn "xrandr --output VGA1 --off")
         ]
