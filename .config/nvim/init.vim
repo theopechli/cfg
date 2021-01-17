@@ -1,6 +1,9 @@
 set t_8f=[38;2;%lu;%lu;%lum
 set t_8b=[48;2;%lu;%lu;%lum
+set t_Co=256
 set termguicolors
+set background=dark
+" colorscheme desert
 filetype plugin on
 filetype indent on
 syntax enable
@@ -30,11 +33,9 @@ set showcmd
 set ruler
 set undolevels=1000
 set backspace=indent,eol,start
-set list listchars=tab:»·,trail:·
+" set list listchars=tab:»·,trail:·
 set mouse=a
-set colorcolumn=80
-set background=dark
-colorscheme koehler
+" set colorcolumn=80
 
 set path+=**
 set wildmenu
@@ -61,6 +62,7 @@ augroup commenting_blocks_of_code
   autocmd FileType tex              let b:comment_leader = '% '
   autocmd FileType mail             let b:comment_leader = '> '
   autocmd FileType vim              let b:comment_leader = '" '
+  autocmd FileType lua              let b:comment_leader = '-- '
 augroup END
 noremap <silent> ,cc :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')<CR>/<CR>:nohlsearch<CR>
 noremap <silent> ,cu :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR>:nohlsearch<CR>
