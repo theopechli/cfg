@@ -21,7 +21,3 @@ fi
 if [ -d "$HOME/.local/bin" ] ; then
     PATH="$PATH:$HOME/.local/bin"
 fi
-
-if [ -d "$PATH:$HOME/go/bin" ] ; then
-    PATH="$PATH:$HOME/go/bin"
-fi
