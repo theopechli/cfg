@@ -23,8 +23,6 @@
 
 (set-face-attribute 'default nil :font "Fira Code Retina" :height 100)
 
-(load-theme 'wombat)
-
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 (defvar bootstrap-version)
@@ -118,8 +116,6 @@
 (use-package lsp-ui
   :hook
   (lsp-mode . lsp-ui-mode))
-  ;; :custom
-  ;; (lsp-ui-doc-position 'bottom))
 
 (use-package lsp-treemacs)
 
@@ -152,4 +148,5 @@
 (use-package lsp-java
   :config
   (add-hook 'java-mode-hook 'lsp)
+  (add-hook 'java-mode-hook (defun my-set-java-tab-width () (setq tab-width 4)))
   (require 'dap-java))
