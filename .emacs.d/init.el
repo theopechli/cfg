@@ -14,16 +14,44 @@
 
 (dolist (mode '(org-mode-hook
                 term-mode-hook
+		ansi-term-mode-hook
                 shell-mode-hook
-	        treemacs-mode-hook
-                eshell-mode-hook))
+		eshell-mode-hook
+	        treemacs-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (show-paren-mode t)
 
-(set-face-attribute 'default nil :font "Fira Code Retina" :height 100)
+(set-face-attribute 'default nil :font "Noto Sans Mono" :height 100)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
+
+(load-theme 'leuven)
+
+(defun sudo-edit (&optional arg)
+  "Edit currently visited file as root.
+
+With a prefix ARG prompt for a file to visit.
+Will also prompt for a file to visit if current
+buffer is not visiting a file.
+
+URL `https://emacsredux.com/blog/2013/04/21/edit-files-as-root/'"
+  (interactive "P")
+  (if (or arg (not buffer-file-name))
+      (find-file (concat "/sudo:root@localhost:"
+                         (ido-read-file-name "Find file(as root): ")))
+    (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
+
+(progn
+  (define-prefix-command 'shell-keymap)
+  (define-key shell-keymap (kbd "e") 'eshell)
+  (define-key shell-keymap (kbd  "a") 'ansi-term)
+  (global-set-key (kbd "C-c s") 'shell-keymap))
+
+(progn
+  (define-prefix-command 'edit-keymap)
+  (define-key edit-keymap (kbd "s") 'sudo-edit)
+  (global-set-key (kbd "C-c e") 'edit-keymap))
 
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -41,27 +69,16 @@
 (straight-use-package 'use-package)
 (setq straight-use-package-by-default t)
 
-(use-package diminish)
-
-(use-package doom-themes
-  :init
-  (load-theme 'doom-one t))
-
-(use-package all-the-icons)
-
-(use-package doom-modeline
-  :init
-  (doom-modeline-mode 1)
-  :custom
-  ((doom-modeline-height 15)))
-
 (use-package ivy
   :init
   (ivy-mode 1)
   :diminish
   ivy-mode
-  :bind
-  (("C-s" . swiper))
+  :bind*
+  (("C-s" . swiper-isearch)
+   ("C-x b" . ivy-switch-buffer)
+   ("C-c v" . ivy-push-view)
+   ("C-c V" . ivy-pop-view))
   :config
   (setq ivy-use-virtual-buffers t)
   (setq ivy-count-format "(%d/%d) "))
@@ -71,9 +88,16 @@
   (counsel-mode 1)
   :diminish
   counsel-mode
-  :bind
+  :bind*
   (("M-x" . counsel-M-x)
-   ("C-x b" . counsel-ibuffer)))
+   ("C-x C-f" . counsel-find-file)
+   ("M-y" . counsel-yank-pop)
+   ("C-h f" . counsel-describe-function)
+   ("C-h v" . counsel-describe-variable)
+   ("C-h l" . counsel-find-library)
+   ("C-h i" . counsel-info-lookup-symbol)
+   ("C-h u" . counsel-unicode-char)
+   ("C-h j" . counsel-set-variable)))
 
 (use-package which-key
   :init
@@ -83,53 +107,7 @@
   :config
   (setq which-key-idle-delay 1))
 
-(use-package projectile
-  :init
-  (when (file-directory-p "~/Projects/Git/")
-    (setq projectile-project-search-path '("~/Projects/Git")))
-  (setq projectile-switch-project-action #'projectile-dired)
-  :diminish
-  projectile-mode
-  :config
-  (projectile-mode)
-  :custom
-  ((projectile-completion-system 'ivy))
-  :bind-keymap
-  ("C-c p" . projectile-command-map))
-
 (use-package magit)
-
-(use-package treemacs)
-
-(use-package yasnippet
-  :config
-  (yas-global-mode))
-
-(use-package lsp-mode
-  :init
-  (setq lsp-keymap-prefix "C-c l")
-  :config
-  (lsp-enable-which-key-integration t)
-  :commands
-  (lsp lsp-deferred))
-
-(use-package lsp-ui
-  :hook
-  (lsp-mode . lsp-ui-mode))
-
-(use-package lsp-treemacs)
-
-(use-package lsp-ivy)
-
-(use-package dap-mode
-  :after
-  lsp-mode
-  :config
-  (dap-auto-configure-mode))
-
-(use-package flycheck
-  :init
-  (global-flycheck-mode))
 
 (use-package company
   :after
@@ -145,8 +123,102 @@
   (company-minimum-prefix-length 1)
   (company-idle-delay 0.0))
 
-(use-package lsp-java
-  :config
-  (add-hook 'java-mode-hook 'lsp)
-  (add-hook 'java-mode-hook (defun my-set-java-tab-width () (setq tab-width 4)))
-  (require 'dap-java))
+(defun html-template ()
+  (interactive)
+  (append-to-file "<!DOCTYPE html>
+<html lang=\"el-GR\">
+<head>
+  <title></title>
+  <meta charset=\"utf-8\">
+  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\">
+  <meta name=\"description\" content=\"Description of the page less than 150 characters\">
+  <link rel=\"icon\" type=\"image/png\" href=\"https://example.com/favicon.png\">
+  <link rel=\"apple-touch-icon\" href=\"/custom-icon.png\">
+  <meta name=\"apple-mobile-web-app-capable\" content=\"yes\">
+  <meta name=\"apple-mobile-web-app-status-bar-style\" content=\"black\">
+  <meta name=\"msapplication-config\" content=\"browserconfig.xml\" />
+</head>
+<body>
+</body>
+</html>
+" nil (counsel-find-file))
+  (revert-buffer :ignore-auto :noconfirm))
+
+(defun xml-template-browserconfig ()
+  (interactive)
+  (append-to-file "<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<browserconfig>
+   <msapplication>
+     <tile>
+        <square70x70logo src=\"small.png\"/>
+        <square150x150logo src=\"medium.png\"/>
+        <wide310x150logo src=\"wide.png\"/>
+        <square310x310logo src=\"large.png\"/>
+     </tile>
+   </msapplication>
+</browserconfig>
+" nil (counsel-find-file))
+  (revert-buffer :ignore-auto :noconfirm))
+
+(defun escape-quotes (@begin @end)
+  "Replace 「\"」 by 「\\\"」 in current line or text selection.
+See also: `unescape-quotes'
+
+URL `http://ergoemacs.org/emacs/elisp_escape_quotes.html'
+Version 2017-01-11"
+  (interactive
+   (if (use-region-p)
+       (list (region-beginning) (region-end))
+     (list (line-beginning-position) (line-end-position))))
+  (save-excursion
+      (save-restriction
+        (narrow-to-region @begin @end)
+        (goto-char (point-min))
+        (while (search-forward "\"" nil t)
+          (replace-match "\\\"" "FIXEDCASE" "LITERAL")))))
+
+(defun unescape-quotes (@begin @end)
+  "Replace  「\\\"」 by 「\"」 in current line or text selection.
+See also: `escape-quotes'
+
+URL `http://ergoemacs.org/emacs/elisp_escape_quotes.html'
+Version 2017-01-11"
+  (interactive
+   (if (use-region-p)
+       (list (region-beginning) (region-end))
+     (list (line-beginning-position) (line-end-position))))
+  (save-excursion
+    (save-restriction
+      (narrow-to-region @begin @end)
+      (goto-char (point-min))
+      (while (search-forward "\\\"" nil t)
+        (replace-match "\"" "FIXEDCASE" "LITERAL")))))
+
+(defun toggle-transparency ()
+   (interactive)
+   (let ((alpha (frame-parameter nil 'alpha)))
+     (set-frame-parameter
+      nil 'alpha
+      (if (eql (cond ((numberp alpha) alpha)
+                     ((numberp (cdr alpha)) (cdr alpha))
+                     ;; Also handle undocumented (<active> <inactive>) form.
+                     ((numberp (cadr alpha)) (cadr alpha)))
+               100)
+          '(85 . 50) '(100 . 100)))))
+
+(defun light-theme ()
+  (interactive)
+  (disable-theme 'misterioso)
+  (load-theme 'leuven))
+
+(defun dark-theme ()
+  (interactive)
+  (disable-theme 'leuven)
+  (load-theme 'misterioso))
+
+(progn
+  (define-prefix-command 'theme-keymap)
+  (define-key theme-keymap (kbd "t") 'toggle-transparency)
+  (define-key theme-keymap (kbd "l") 'light-theme)
+  (define-key theme-keymap (kbd "d") 'dark-theme)
+  (global-set-key (kbd "C-c t") 'theme-keymap))
