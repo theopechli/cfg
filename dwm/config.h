@@ -69,13 +69,14 @@ static const char *firefoxcmd[]  = { "firefox", NULL };
 static const char *firefoxprimecmd[]  = { "prime-run", "firefox", NULL };
 static const char *redshiftcmd[]  = { "redshift", NULL };
 static const char *redshiftkillcmd[]  = { "killall", "redshift", NULL };
-static const char *screencmd[] = { "xrandr", "--output", "VGA1", "--mode", "1360x768", "--pos", "0x0", "--rotate", "normal", "--right-of", "eDP1", "--output", "eDP1", "--mode", "1366x768", "--pos", "1366x420", "--rotate", "normal", NULL };
-static const char *screenkillcmd[] = { "xrandr", "--output", "VGA1", "--off", NULL };
+static const char *screencmd[] = { "xrandr", "--output", "VGA-1", "--mode", "1360x768", "--pos", "0x0", "--rotate", "normal", "--right-of", "eDP-1", "--output", "eDP-1", "--mode", "1366x768", "--pos", "1366x420", "--rotate", "normal", NULL };
+static const char *screenkillcmd[] = { "xrandr", "--output", "VGA-1", "--off", NULL };
 static const char *mpctogglecmd[] = { "mpc", "toggle", NULL };
 static const char *mpcvolumelowercmd[] = { "mpc", "volume", "-5", NULL };
 static const char *mpcvolumeraisecmd[] = { "mpc", "volume", "+5", NULL };
 static const char *mpcprevcmd[] = { "mpc", "prev", NULL };
 static const char *mpcnextcmd[] = { "mpc", "next", NULL };
+static const char *gtkthemecmd[] = { "sed", "-i", "'s/gtk-application-prefer-dark-theme = false/gtk-application-prefer-dark-theme = true/'", "/home/theo/.config/gtk-3.0/settings.ini", NULL };
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
@@ -128,6 +129,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_backslash, spawn,                { .v = mpctogglecmd } },
 	{ MODKEY,                       XK_bracketleft, spawn,              { .v = mpcprevcmd } },
 	{ MODKEY,                       XK_bracketright, spawn,             { .v = mpcnextcmd } },
+	{ MODKEY,                       XK_g, spawn,                        { .v = gtkthemecmd } },
 };
 
 /* button definitions */
