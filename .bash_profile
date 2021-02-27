@@ -11,7 +11,7 @@ fi
 export VISUAL=nvim
 export EDITOR="$VISUAL"
 export LANG=en_US.UTF-8
-export TERM=st-256color
+export TERM=xterm-termite
 export IDEA_JDK="/usr/lib/jvm/java-11-openjdk"
 
 if [ -d "$HOME/bin" ] ; then
