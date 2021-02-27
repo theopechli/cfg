@@ -1,0 +1,1 @@
+alias pvmpv prime-run mpv --ytdl-format="bestvideo[height<?1080]+bestaudio/best" $1
