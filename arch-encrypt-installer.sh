@@ -106,6 +106,7 @@ lvcreate -L 24G MyVolGroup -n swap
 lvcreate -L 32G MyVolGroup -n root
 lvcreate -l 100%FREE MyVolGroup -n home
 
+mkfs.fat -F32 "${part_efi}"
 mkfs.ext4 /dev/MyVolGroup/root
 mkfs.ext4 /dev/MyVolGroup/home
 mkswap /dev/MyVolGroup/swap
@@ -117,8 +118,6 @@ mount /dev/MyVolGroup/root /mnt
 mkdir /mnt/home
 mount /dev/MyVolGroup/home /mnt/home
 swapon /dev/MyVolGroup/swap
-
-mkfs.fat -F32 "${part_efi}"
 mkdir /mnt/boot
 mount "${part_efi}" /mnt/boot
 
@@ -141,12 +140,10 @@ arch-chroot /mnt hwclock --systohc
 arch-chroot /mnt sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 arch-chroot /mnt sed -i 's/#el_GR.UTF-8 UTF-8/el_GR.UTF-8 UTF-8/' /etc/locale.gen
 arch-chroot /mnt locale-gen
-
 echo -e "LANG=en_US.UTF-8" > /mnt/etc/locale.conf
 
 # Network configuration
 echo "${hostname}" > /mnt/etc/hostname
-
 echo -e "127.0.0.1       localhost
 ::1             localhost
 127.0.1.1       ${hostname}.localdomain	${hostname}" > /mnt/etc/hosts
@@ -154,7 +151,7 @@ echo -e "127.0.0.1       localhost
 # Add user
 arch-chroot /mnt useradd -m -G wheel,video "$user"
 
-# Root and User password
+# Set root and user password
 echo "$user:$password" | chpasswd --root /mnt
 echo "root:$password" | chpasswd --root /mnt
 
