@@ -13,10 +13,10 @@
 (global-display-line-numbers-mode t)
 
 (dolist (mode '(term-mode-hook
-		ansi-term-mode-hook
+				ansi-term-mode-hook
                 shell-mode-hook
-		eshell-mode-hook
-	        treemacs-mode-hook))
+				eshell-mode-hook
+				treemacs-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (show-paren-mode t)
@@ -231,11 +231,11 @@ Version 2017-01-11"
        (list (region-beginning) (region-end))
      (list (line-beginning-position) (line-end-position))))
   (save-excursion
-      (save-restriction
-        (narrow-to-region @begin @end)
-        (goto-char (point-min))
-        (while (search-forward "\"" nil t)
-          (replace-match "\\\"" "FIXEDCASE" "LITERAL")))))
+    (save-restriction
+      (narrow-to-region @begin @end)
+      (goto-char (point-min))
+      (while (search-forward "\"" nil t)
+        (replace-match "\\\"" "FIXEDCASE" "LITERAL")))))
 
 (defun unescape-quotes (@begin @end)
   "Replace  「\\\"」 by 「\"」 in current line or text selection.
@@ -255,16 +255,16 @@ Version 2017-01-11"
         (replace-match "\"" "FIXEDCASE" "LITERAL")))))
 
 (defun toggle-transparency ()
-   (interactive)
-   (let ((alpha (frame-parameter nil 'alpha)))
-     (set-frame-parameter
-      nil 'alpha
-      (if (eql (cond ((numberp alpha) alpha)
-                     ((numberp (cdr alpha)) (cdr alpha))
-                     ;; Also handle undocumented (<active> <inactive>) form.
-                     ((numberp (cadr alpha)) (cadr alpha)))
-               100)
-          '(80 . 80) '(100 . 100)))))
+  (interactive)
+  (let ((alpha (frame-parameter nil 'alpha)))
+    (set-frame-parameter
+     nil 'alpha
+     (if (eql (cond ((numberp alpha) alpha)
+                    ((numberp (cdr alpha)) (cdr alpha))
+                    ;; Also handle undocumented (<active> <inactive>) form.
+                    ((numberp (cadr alpha)) (cadr alpha)))
+              100)
+         '(80 . 80) '(100 . 100)))))
 
 (toggle-transparency)
 (toggle-transparency)
@@ -371,7 +371,7 @@ When file is an mp4 video, open it with mpv."
   (create-dir-hooks)
   (with-temp-file "/sudo:root@localhost:/etc/pacman.d/hooks/100-systemd-boot.hook"
 	(insert
-	"[Trigger]
+	 "[Trigger]
 Type = Package
 Operation = Upgrade
 Target = systemd
