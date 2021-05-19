@@ -16,7 +16,7 @@
 				ansi-term-mode-hook
                 shell-mode-hook
 				eshell-mode-hook
-				treemacs-mode-hook))
+				vterm-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (show-paren-mode t)
@@ -28,9 +28,10 @@
 
 (display-time)
 
-(load-theme 'wombat)
-
 (setq font '"Noto Sans Mono")
+(when (member "Noto Color Emoji" (font-family-list))
+  (set-fontset-font
+   t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
 
 ;;keep cursor at same position when scrolling
 ;; (setq scroll-preserve-screen-position 1)
@@ -66,6 +67,17 @@
   (define-key font-weight-keymap (kbd "b") 'toggle-font-weight-bold)
   (global-set-key (kbd "C-c f w") 'font-weight-keymap))
 
+(with-eval-after-load 'dired
+  (define-key dired-mode-map "k" 'kill-this-buffer))
+
+(defun no-mod-nav-keys()
+  (local-set-key (kbd "n") #'next-line)
+  (local-set-key (kbd "p") #'previous-line)
+  (local-set-key (kbd "v") #'scroll-up-command))
+
+(add-hook 'read-only-mode-hook
+		  #'no-mod-nav-keys)
+
 (require 'ido)
 (ido-mode 1)
 (make-local-variable 'ido-decorations)
@@ -85,8 +97,38 @@
 (define-key icomplete-minibuffer-map (kbd "<right>") 'icomplete-forward-completions)
 (define-key icomplete-minibuffer-map (kbd "<left>") 'icomplete-backward-completions)
 
-(when (fboundp 'windmove-default-keybindings)
-  (windmove-default-keybindings))
+(setq org-adapt-indentation nil)
+(setq org-startup-folded t)
+(setq org-ellipsis " ▾")
+(setq org-agenda-start-with-log-mode t)
+(setq org-log-done 'time)
+(setq org-log-into-drawer t)
+;; (set-face-attribute 'org-headline-done nil :strike-through t)
+(setq org-agenda-files
+	  '("~/Personal/Org/Tasks.org"))
+
+(progn
+  (define-prefix-command 'org-keymap)
+  (define-key org-keymap (kbd "a") 'org-agenda)
+  (global-set-key (kbd "C-c o") 'org-keymap))
+
+(add-to-list 'load-path "~/.emacs.d/lisp/emacs-which-key")
+(require 'which-key)
+(which-key-mode)
+(setq which-key-idle-delay 1)
+
+(add-to-list 'load-path "~/.emacs.d/lisp/emacs-libvterm")
+(require 'vterm)
+
+(add-to-list 'load-path "~/.emacs.d/lisp/rust-mode/")
+(autoload 'rust-mode "rust-mode" nil t)
+(add-hook 'rust-mode-hook
+          (lambda () (setq indent-tabs-mode nil)))
+(setq rust-format-on-save t)
+;; (define-key rust-mode-map (kbd "C-c C-c") 'rust-run)
+
+;; (when (fboundp 'windmove-default-keybindings)
+;;   (windmove-default-keybindings))
 
 (defun sudo-edit (&optional arg)
   "Edit currently visited file as root.
@@ -111,23 +153,24 @@ URL `https://emacsredux.com/blog/2013/04/21/edit-files-as-root/'"
   (define-prefix-command 'shell-keymap)
   (define-key shell-keymap (kbd "e") 'eshell)
   (define-key shell-keymap (kbd  "a") 'ansi-term)
-  (global-set-key (kbd "C-c s") 'shell-keymap))
+  (define-key shell-keymap (kbd  "v") 'vterm)
+  (global-set-key (kbd "C-c c") 'shell-keymap))
 
-;; (defvar bootstrap-version)
-;; (let ((bootstrap-file
-;;        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-;;       (bootstrap-version 5))
-;;   (unless (file-exists-p bootstrap-file)
-;;     (with-current-buffer
-;;         (url-retrieve-synchronously
-;;          "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-;;          'silent 'inhibit-cookies)
-;;       (goto-char (point-max))
-;;       (eval-print-last-sexp)))
-;;   (load bootstrap-file nil 'nomessage))
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-;; (straight-use-package 'use-package)
-;; (setq straight-use-package-by-default t)
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t)
 
 ;; (use-package ivy
 ;;   :init
@@ -158,16 +201,6 @@ URL `https://emacsredux.com/blog/2013/04/21/edit-files-as-root/'"
 ;;    ("C-h i" . counsel-info-lookup-symbol)
 ;;    ("C-h u" . counsel-unicode-char)
 ;;    ("C-h j" . counsel-set-variable)))
-
-;; (use-package which-key
-;;   :init
-;;   (which-key-mode)
-;;   :diminish
-;;   which-key-mode
-;;   :config
-;;   (setq which-key-idle-delay 1))
-
-;; (use-package magit)
 
 ;; (use-package company
 ;;   :after
@@ -269,20 +302,34 @@ Version 2017-01-11"
 (toggle-transparency)
 (toggle-transparency)
 
-(defun light-theme ()
-  (interactive)
-  (disable-theme 'wombat))
+(defun disable-all-themes ()
+  "Disable all active themes."
+  (dolist (i custom-enabled-themes)
+    (disable-theme i)))
 
-(defun dark-theme ()
+(defun default-theme ()
   (interactive)
+  (disable-all-themes))
+
+(defun wombat-theme ()
+  (interactive)
+  (disable-all-themes)
   (load-theme 'wombat))
+
+(defun leuven-theme ()
+  (interactive)
+  (disable-all-themes)
+  (load-theme 'leuven))
 
 (progn
   (define-prefix-command 'theme-keymap)
   (define-key theme-keymap (kbd "t") 'toggle-transparency)
-  (define-key theme-keymap (kbd "l") 'light-theme)
-  (define-key theme-keymap (kbd "d") 'dark-theme)
+  (define-key theme-keymap (kbd "d") 'default-theme)
+  (define-key theme-keymap (kbd "l") 'leuven-theme)
+  (define-key theme-keymap (kbd "w") 'wombat-theme)
   (global-set-key (kbd "C-c t") 'theme-keymap))
+
+;; (wombat-theme)
 
 (defun mpc-toggle ()
   (interactive)
@@ -354,13 +401,12 @@ When file is an mp4 video, open it with mpv."
 
 (defun wallpaper-set-wallpaper ()
   (start-process-shell-command
-   "Wallpaper" nil "feh --bg-scale --randomize ~/Pictures/*.png"))
+   "Wallpaper" nil "feh --bg-scale --randomize ~/Pictures/*"))
 
-(defun wallpaper-toggle-cycle ()
+(defun
+	wallpaper-toggle-cycle ()
   (interactive)
-  (run-with-timer 0 10 #'wallpaper-set-wallpaper))
-
-(find-file "~/Personal/Org/Browser/Bookmarks.org")
+  (run-with-timer 0 20 #'wallpaper-set-wallpaper))
 
 (defun create-dir-hooks ()
   (interactive)
@@ -381,9 +427,13 @@ Description = Updating systemd-boot
 When = PostTransaction
 Exec = /usr/bin/bootctl update")))
 
-;; (require 'whitespace)
-;; (setq whitespace-style '(face empty tabs lines-tail trailing))
-;; (global-whitespace-mode t)
+(require 'whitespace)
+(setq whitespace-style '(face empty tabs lines-tail trailing))
+
+(progn
+  (define-prefix-command 'whitespace-keymap)
+  (define-key whitespace-keymap (kbd "t") 'global-whitespace-mode)
+  (global-set-key (kbd "C-c w") 'whitespace-keymap))
 
 ;; (defun checksum ()
 ;;   (interactive)
@@ -431,3 +481,57 @@ Exec = /usr/bin/bootctl update")))
 ;;           (indent-relative))
 ;;         ( t
 ;;           (insert "    "))))
+
+(add-to-list 'load-path "~/.emacs.d/lisp/dash.el")
+
+(add-to-list 'load-path "~/.emacs.d/lisp/Emacs-wgrep")
+(add-to-list 'load-path "~/.emacs.d/lisp/transient/lisp")
+(add-to-list 'load-path "~/.emacs.d/lisp/rg.el")
+(require 'rg)
+(rg-enable-default-bindings)
+
+(add-to-list 'load-path "~/.emacs.d/lisp/with-editor")
+(add-to-list 'load-path "~/.emacs.d/lisp/magit/lisp")
+(require 'magit)
+
+(add-to-list 'load-path "~/.emacs.d/lisp/flycheck")
+(require 'flycheck)
+(add-hook 'lsp-mode #'flycheck-mode)
+
+(use-package lsp-mode
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :hook
+  (c-mode . lsp-deferred)
+  (cc-mode . lsp-deferred)
+  :commands (lsp lsp-deferred)
+  :config
+  (lsp-enable-which-key-integration t))
+
+(use-package lsp-ui
+  :straight t
+  :hook (lsp-mode . lsp-ui-mode)
+  :config
+  (setq lsp-ui-sideline-enable t)
+  (setq lsp-ui-sideline-show-hover nil)
+  (setq lsp-ui-doc-position 'bottom)
+  (lsp-ui-doc-show))
+
+(use-package modus-themes
+  :ensure
+  :init
+  (setq modus-themes-slanted-constructs t
+        modus-themes-bold-constructs nil
+        modus-themes-region 'no-extend)
+  (modus-themes-load-themes)
+  :config
+  (modus-themes-load-vivendi)
+  :bind ("<f5>" . modus-themes-toggle))
+
+(use-package csharp-mode
+  :ensure t)
+
+(use-package slime
+  :ensure t
+  :init
+  (setq inferior-lisp-program "sbcl"))
