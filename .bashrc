@@ -5,21 +5,39 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
-# PS1='[\u@\h \W]\$ '
+# User specific environment
+if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]
+then
+    PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+fi
+export PATH
 
 alias ls='ls --color=auto'
 alias la='ls -la'
 alias vmpv='mpv --ytdl-format="bestvideo[height<?1080]+bestaudio/best"'
 alias ampv='mpv --ytdl-format="bestaudio/best" --no-video'
 alias pvmpv='prime-run mpv --ytdl-format="bestvideo[height<?1080]+bestaudio/best"'
-alias ydla=$'youtube-dl --audio-quality 0 --extract-audio --audio-format m4a -o \'./%(title)s.%(ext)s\''
+alias ydla=$'youtube-dl --audio-quality 0 --extract-audio --audio-format m4a -o "./%(title)s.%(ext)s"'
 alias rmpv='mpv av://v4l2:/dev/video0 --profile=low-latency --untimed'
 alias gs='git status'
 alias gc='git commit'
+alias gcl='git clone'
+alias gco='git checkout'
 alias ga='git add'
 alias gd='git diff'
-alias gp='git push'
+alias gps='git push'
+alias gpl='git pull'
 alias gl='git log'
+alias gb='git branch'
+alias mpct='mpc toggle'
+alias mpcn='mpc next'
+alias mpcp='mpc prev'
+alias mpcs='mpc single'
+alias mpcr='mpc repeat'
+
+mpca () {
+    mpc ls | grep "${1}" | mpc add
+}
 
 man() {
     LESS_TERMCAP_md=$'\e[01;31m' \
@@ -39,19 +57,10 @@ scv() {
     ffmpeg -f x11grab -video_size 1366x768 -i $DISPLAY -framerate 25 -c:v ffvhuff "$1".mkv
 }
 
-export VISUAL=nvim
+export VISUAL=emacs
 export EDITOR="$VISUAL"
 export LANG=en_US.UTF-8
-export TERM=xterm-termite
-export IDEA_JDK="/usr/lib/jvm/java-11-openjdk"
-
-if [ -d "$HOME/bin" ] ; then
-    PATH="$PATH:$HOME/bin"
-fi
-
-if [ -d "$HOME/.local/bin" ] ; then
-    PATH="$PATH:$HOME/.local/bin"
-fi
+export TERM=alacritty
 
 blk='\[\033[01;30m\]'   # Black
 red='\[\033[01;31m\]'   # Red

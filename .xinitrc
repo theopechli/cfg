@@ -35,9 +35,4 @@ fi
 [ -f /etc/xprofile ] && . /etc/xprofile
 [ -f ~/.xprofile ] && . ~/.xprofile
 
-# while xsetroot -name "`date +'%A %d/%m/%Y %H:%M'`"
-# do
-#     sleep 60
-# done &
-# exec dwm
 exec i3

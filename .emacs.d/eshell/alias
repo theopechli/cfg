@@ -1,6 +1,9 @@
-alias scf ffmpeg -f x11grab -video_size 1366x768 -i :0 -vframes 1 $1.png
-alias ydla youtube-dl --audio-quality 0 --extract-audio --audio-format m4a -o './%(title)s.%(ext)s' $1
-alias pvmpv prime-run mpv --ytdl-format="bestvideo[height<?1080]+bestaudio/best" $1
-alias rmpv mpv av://v4l2:/dev/video0 --profile=low-latency --untimed
-alias vmpv mpv --ytdl-format=bestvideo[height<?1080]+bestaudio/best $1
+alias la ls -la $*
+alias ll ls -l $*
 alias ampv mpv --ytdl-format=bestaudio/best --no-video $1
+alias vmpv mpv --ytdl-format=bestvideo[height<?1080]+bestaudio/best $1
+alias rmpv mpv av://v4l2:/dev/video0 --profile=low-latency --untimed
+alias pvmpv prime-run mpv --ytdl-format="bestvideo[height<?1080]+bestaudio/best" $1
+alias ydla youtube-dl --audio-quality 0 --extract-audio --audio-format m4a -o './%(title)s.%(ext)s' $1
+alias scf ffmpeg -f x11grab -video_size 1366x768 -i :0 -vframes 1 $1.png
+alias scv ffmpeg -f x11grab -video_size 1366x768 -i :0 -framerate 25 -c:v ffvhuff $1.mkv

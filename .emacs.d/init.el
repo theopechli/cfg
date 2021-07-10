@@ -12,6 +12,8 @@
 (column-number-mode)
 (global-display-line-numbers-mode t)
 
+(load-theme 'wombat)
+
 (dolist (mode '(term-mode-hook
 				ansi-term-mode-hook
                 shell-mode-hook
@@ -28,13 +30,6 @@
 
 (display-time)
 
-(setq font '"Noto Sans Mono")
-(when (member "Noto Color Emoji" (font-family-list))
-  (set-fontset-font
-   t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
-
-;;keep cursor at same position when scrolling
-;; (setq scroll-preserve-screen-position 1)
 ;;scroll window up/down by one line
 (global-set-key (kbd "M-n") (kbd "C-u 1 C-v"))
 (global-set-key (kbd "M-p") (kbd "C-u 1 M-v"))
@@ -44,39 +39,19 @@
 (setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
 (setq scroll-step 1) ;; keyboard scroll one line at a time
 
-;; (set-face-attribute 'default nil :font "Noto Sans Mono" :height 100)
+(set-face-attribute 'default nil
+					:family "DejaVu Sans Mono"
+					:height 105
+					:weight 'regular)
 
-(require 'cl)
-(defun font-candidate (&rest fonts)
-  "Return existing font which first match."
-  (find-if (lambda (f) (find-font (font-spec :name f))) fonts))
+(when (member "Noto Color Emoji" (font-family-list))
+  (set-fontset-font
+   t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
 
-(defun toggle-font-weight-normal ()
-  (interactive)
-  (set-face-attribute 'default nil :font (font-candidate (concat font '"-10:weight=normal"))))
-
-(defun toggle-font-weight-bold ()
-  (interactive)
-  (set-face-attribute 'default nil :font (font-candidate (concat font '"-10:weight=bold"))))
-
-(toggle-font-weight-bold)
-
-(progn
-  (define-prefix-command 'font-weight-keymap)
-  (define-key font-weight-keymap (kbd "n") 'toggle-font-weight-normal)
-  (define-key font-weight-keymap (kbd "b") 'toggle-font-weight-bold)
-  (global-set-key (kbd "C-c f w") 'font-weight-keymap))
+(setq calendar-week-start-day 1)
 
 (with-eval-after-load 'dired
   (define-key dired-mode-map "k" 'kill-this-buffer))
-
-(defun no-mod-nav-keys()
-  (local-set-key (kbd "n") #'next-line)
-  (local-set-key (kbd "p") #'previous-line)
-  (local-set-key (kbd "v") #'scroll-up-command))
-
-(add-hook 'read-only-mode-hook
-		  #'no-mod-nav-keys)
 
 (require 'ido)
 (ido-mode 1)
@@ -112,23 +87,35 @@
   (define-key org-keymap (kbd "a") 'org-agenda)
   (global-set-key (kbd "C-c o") 'org-keymap))
 
-(add-to-list 'load-path "~/.emacs.d/lisp/emacs-which-key")
+(require 'package)
+(package-initialize)
+(unless package-archive-contents
+  (package-refresh-contents))
+
+(dolist (package '(which-key eglot rainbow-mode system-packages))
+ (unless (package-installed-p package)
+   (package-install package)))
+
 (require 'which-key)
 (which-key-mode)
 (setq which-key-idle-delay 1)
 
-(add-to-list 'load-path "~/.emacs.d/lisp/emacs-libvterm")
-(require 'vterm)
+(require 'eglot)
+(add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
+(add-hook 'c-mode-hook 'eglot-ensure)
+(add-hook 'c++-mode-hook 'eglot-ensure)
 
-(add-to-list 'load-path "~/.emacs.d/lisp/rust-mode/")
-(autoload 'rust-mode "rust-mode" nil t)
-(add-hook 'rust-mode-hook
-          (lambda () (setq indent-tabs-mode nil)))
-(setq rust-format-on-save t)
-;; (define-key rust-mode-map (kbd "C-c C-c") 'rust-run)
+(require 'system-packages)
+(progn
+  (define-prefix-command 'system-packages-keymap)
+  (define-key system-packages-keymap (kbd "u") 'system-packages-update)
+  (define-key system-packages-keymap (kbd "s") 'system-packages-search)
+  (define-key system-packages-keymap (kbd "i") 'system-packages-install)
+  (define-key system-packages-keymap (kbd "l") 'system-packages-log)
+  (global-set-key (kbd "C-c s") 'system-packages-keymap))
 
-;; (when (fboundp 'windmove-default-keybindings)
-;;   (windmove-default-keybindings))
+(require 'image-dired)
+(setq image-dired-external-viewer "feh")
 
 (defun sudo-edit (&optional arg)
   "Edit currently visited file as root.
@@ -155,66 +142,6 @@ URL `https://emacsredux.com/blog/2013/04/21/edit-files-as-root/'"
   (define-key shell-keymap (kbd  "a") 'ansi-term)
   (define-key shell-keymap (kbd  "v") 'vterm)
   (global-set-key (kbd "C-c c") 'shell-keymap))
-
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-
-(straight-use-package 'use-package)
-(setq straight-use-package-by-default t)
-
-;; (use-package ivy
-;;   :init
-;;   (ivy-mode 1)
-;;   :diminish
-;;   ivy-mode
-;;   :bind*
-;;   (("C-s" . swiper-isearch)
-;;    ("C-x b" . ivy-switch-buffer)
-;;    ("C-c v" . ivy-push-view)
-;;    ("C-c V" . ivy-pop-view))
-;;   :config
-;;   (setq ivy-use-virtual-buffers t)
-;;   (setq ivy-count-format "(%d/%d) "))
-
-;; (use-package counsel
-;;   :init
-;;   (counsel-mode 1)
-;;   :diminish
-;;   counsel-mode
-;;   :bind*
-;;   (("M-x" . counsel-M-x)
-;;    ("C-x C-f" . counsel-find-file)
-;;    ("M-y" . counsel-yank-pop)
-;;    ("C-h f" . counsel-describe-function)
-;;    ("C-h v" . counsel-describe-variable)
-;;    ("C-h l" . counsel-find-library)
-;;    ("C-h i" . counsel-info-lookup-symbol)
-;;    ("C-h u" . counsel-unicode-char)
-;;    ("C-h j" . counsel-set-variable)))
-
-;; (use-package company
-;;   :after
-;;   lsp-mode
-;;   :hook
-;;   (lsp-mode . company-mode)
-;;   :bind
-;;   (:map company-active-map
-;;         ("<tab>" . company-complete-selection))
-;;   (:map lsp-mode-map
-;;         ("<tab>" . company-indent-or-complete-common))
-;;   :custom
-;;   (company-minimum-prefix-length 1)
-;;   (company-idle-delay 0.0))
 
 (defun html-template ()
   (interactive)
@@ -299,9 +226,6 @@ Version 2017-01-11"
               100)
          '(80 . 80) '(100 . 100)))))
 
-(toggle-transparency)
-(toggle-transparency)
-
 (defun disable-all-themes ()
   "Disable all active themes."
   (dolist (i custom-enabled-themes)
@@ -329,8 +253,6 @@ Version 2017-01-11"
   (define-key theme-keymap (kbd "w") 'wombat-theme)
   (global-set-key (kbd "C-c t") 'theme-keymap))
 
-;; (wombat-theme)
-
 (defun mpc-toggle ()
   (interactive)
   (shell-command "mpc toggle"))
@@ -355,10 +277,50 @@ Version 2017-01-11"
   (interactive)
   (shell-command "mpc del 0"))
 
-(defun mpc-play-artist ()
+(defun mpc-repeat ()
   (interactive)
-  (setq artist (read-string "Enter artist: "))
-  (shell-command (concat "mpc ls | grep \"" artist "\" | mpc add")))
+  (shell-command "mpc repeat"))
+
+(defun mpc-single ()
+  (interactive)
+  (shell-command "mpc single"))
+
+(defun mpc-skip-forward ()
+  (interactive)
+  (shell-command "mpc seek +0:0:10"))
+
+(defun mpc-skip-backward ()
+  (interactive)
+  (shell-command "mpc seek -0:0:10"))
+
+(defun mpc-add-song ()
+  (interactive)
+  ;; (setq song (file-relative-name (ido-read-file-name "Play song: " "~/Music/") "~/Music/"))
+  (setq songs
+		(let (value)
+		  (dolist (element (directory-files "~/Music" nil "m4a") value)
+			(setq value (cons element value)))))
+  (setq song (ido-completing-read "Play song: " songs))
+  (dolist (element songs nil)
+	(when (string= element song)
+	  (shell-command (format "%s\"%s\"" "mpc add " song)))))
+
+(defun mpc-add-artist ()
+  (interactive)
+  (setq artists
+		(let (value)
+		  (dolist (element (directory-files "~/Music" nil "m4a") value)
+			(setq value (cons (substring element 0 (string-match " -" element)) value)))))
+  (delq nil (delete-dups artists))
+  (setq artist (ido-completing-read "Play artist: " artists))
+  (dolist (element artists nil)
+	(when (string= element artist)
+	  (shell-command (concat "mpc ls" " | grep \"" element "\" | mpc add")))))
+
+(defun mpc-download ()
+  (interactive)
+  (setq link (read-string "Enter link: "))
+  (async-shell-command (concat "youtube-dl --audio-quality 0 --extract-audio --audio-format m4a -o '~/Music/%(title)s.%(ext)s' " link)))
 
 (progn
   (define-prefix-command 'mpc-keymap)
@@ -368,8 +330,18 @@ Version 2017-01-11"
   (define-key mpc-keymap (kbd "c") 'mpc-clear)
   (define-key mpc-keymap (kbd "u") 'mpc-update)
   (define-key mpc-keymap (kbd "d") 'mpc-delete)
-  (define-key mpc-keymap (kbd "a") 'mpc-play-artist)
+  (define-key mpc-keymap (kbd "r") 'mpc-repeat)
+  (define-key mpc-keymap (kbd "s") 'mpc-single)
+  (define-key mpc-keymap (kbd "f") 'mpc-skip-forward)
+  (define-key mpc-keymap (kbd "b") 'mpc-skip-backward)
+  (define-key mpc-keymap (kbd "a s") 'mpc-add-song)
+  (define-key mpc-keymap (kbd "a a") 'mpc-add-artist)
+  (define-key mpc-keymap (kbd "l") 'mpc-download)
   (global-set-key (kbd "C-c m") 'mpc-keymap))
+
+(defun cam-record-start ()
+  (interactive)
+  (async-shell-command "mpv av://v4l2:/dev/video0 --profile=low-latency --untimed"))
 
 (setq-default tab-width 4)
 (defvaralias 'c-basic-offset 'tab-width)
@@ -403,8 +375,7 @@ When file is an mp4 video, open it with mpv."
   (start-process-shell-command
    "Wallpaper" nil "feh --bg-scale --randomize ~/Pictures/*"))
 
-(defun
-	wallpaper-toggle-cycle ()
+(defun wallpaper-toggle-cycle ()
   (interactive)
   (run-with-timer 0 20 #'wallpaper-set-wallpaper))
 
@@ -444,94 +415,5 @@ Exec = /usr/bin/bootctl update")))
 ;; 	      x
 ;; 	      (read-file-name "Enter file name: ")))))
 
-;; (defun indent-correctly (&optional arg)
-;;   "If at beginning indent line like prev line (tab if still at beginning).
-;;    If at end insert a tab.
-;;    If in whitespace to prev line's whitespace.
-;;    Possibly should do '*' as whitespace.
-;;    "
-;;   (interactive "P")
-;;   (cond ( arg
-;;           (let ((spaces 4))
-;;             (while (> spaces 0)
-;;               (forward-char -1)
-;;               (if (or (char-equal (following-char) ? )
-;;                       (char-equal (following-char) ?\t))
-;;                   (progn (forward-char 1)
-;;                          (backward-delete-char-untabify 1))
-;;                 (setq spaces 1))
-;;               (setq spaces (1- spaces)))))
-;;         ( (bolp)
-;;           (delete-region
-;;            (point) (progn (skip-chars-forward " \t") (point)))
-;;           (insert
-;;            (save-excursion
-;;              (forward-line -1)
-;;              (buffer-substring
-;;               (progn (beginning-of-line) (point))
-;;               (progn ;; (skip-chars-forward "*")
-;;                 (skip-chars-forward " \t") (point)))))
-;;           (if (and (bolp) (or ;; (eq last-input-char ?\t)
-;;                            (eq last-input-event 'return)
-;;                            't)) (insert "    ")))  ;; HACK. FIX THIS.
-;;         ( (or (char-equal (following-char) ? )
-;;               (char-equal (following-char) ?\t))
-;;           (delete-region
-;;            (point) (progn (skip-chars-forward " \t") (point)))
-;;           (indent-relative))
-;;         ( t
-;;           (insert "    "))))
-
-(add-to-list 'load-path "~/.emacs.d/lisp/dash.el")
-
-(add-to-list 'load-path "~/.emacs.d/lisp/Emacs-wgrep")
-(add-to-list 'load-path "~/.emacs.d/lisp/transient/lisp")
-(add-to-list 'load-path "~/.emacs.d/lisp/rg.el")
-(require 'rg)
-(rg-enable-default-bindings)
-
-(add-to-list 'load-path "~/.emacs.d/lisp/with-editor")
-(add-to-list 'load-path "~/.emacs.d/lisp/magit/lisp")
-(require 'magit)
-
-(add-to-list 'load-path "~/.emacs.d/lisp/flycheck")
-(require 'flycheck)
-(add-hook 'lsp-mode #'flycheck-mode)
-
-(use-package lsp-mode
-  :init
-  (setq lsp-keymap-prefix "C-c l")
-  :hook
-  (c-mode . lsp-deferred)
-  (cc-mode . lsp-deferred)
-  :commands (lsp lsp-deferred)
-  :config
-  (lsp-enable-which-key-integration t))
-
-(use-package lsp-ui
-  :straight t
-  :hook (lsp-mode . lsp-ui-mode)
-  :config
-  (setq lsp-ui-sideline-enable t)
-  (setq lsp-ui-sideline-show-hover nil)
-  (setq lsp-ui-doc-position 'bottom)
-  (lsp-ui-doc-show))
-
-(use-package modus-themes
-  :ensure
-  :init
-  (setq modus-themes-slanted-constructs t
-        modus-themes-bold-constructs nil
-        modus-themes-region 'no-extend)
-  (modus-themes-load-themes)
-  :config
-  (modus-themes-load-vivendi)
-  :bind ("<f5>" . modus-themes-toggle))
-
-(use-package csharp-mode
-  :ensure t)
-
-(use-package slime
-  :ensure t
-  :init
-  (setq inferior-lisp-program "sbcl"))
+(find-file "~/Personal/Org/Browser/Bookmarks.org")
+(org-agenda-list)

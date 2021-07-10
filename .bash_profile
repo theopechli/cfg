@@ -11,13 +11,10 @@ fi
 export VISUAL=nvim
 export EDITOR="$VISUAL"
 export LANG=en_US.UTF-8
-export TERM=xterm-termite
-export IDEA_JDK="/usr/lib/jvm/java-11-openjdk"
+export TERM=alacritty
 
-if [ -d "$HOME/bin" ] ; then
-    PATH="$PATH:$HOME/bin"
+if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]
+then
+    PATH="$HOME/.local/bin:$HOME/bin:$PATH"
 fi
-
-if [ -d "$HOME/.local/bin" ] ; then
-    PATH="$PATH:$HOME/.local/bin"
-fi
+export PATH
